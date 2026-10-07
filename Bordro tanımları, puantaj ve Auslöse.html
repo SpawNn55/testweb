@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bordro tanımları, puantaj ve Auslöse</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f4f2;--card:#fff;--tx:#1d2320;--mu:#5d6761;--ln:#d9ddd8;--ac:#0f5c4d;--acbg:#e0efeb;--hd:#e9ece8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161a18;--card:#1f2523;--tx:#e8ece9;--mu:#9aa59f;--ln:#343d39;--ac:#5dcaa5;--acbg:#173a31;--hd:#29312e}}
+:root[data-theme="dark"]{--bg:#161a18;--card:#1f2523;--tx:#e8ece9;--mu:#9aa59f;--ln:#343d39;--ac:#5dcaa5;--acbg:#173a31;--hd:#29312e}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 "Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:20px;font-weight:600;margin:0 0 4px}
+h2{font-size:16px;font-weight:600;margin:0 0 4px}
+p.s{color:var(--mu);font-size:13px;margin:0 0 12px}
+section{background:var(--card);border:1px solid var(--ln);border-radius:8px;padding:16px;margin-top:16px}
+.w{overflow:auto}.sc{max-height:72vh}
+#px thead th,#ax thead th{position:sticky;top:0;z-index:2;box-shadow:0 1px 0 var(--ln)}
+tr.k select{background:transparent}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;font-weight:500;color:var(--mu);text-align:left;padding:6px;border-bottom:1px solid var(--ln);white-space:nowrap}
+td{padding:4px;border-bottom:1px solid var(--ln);vertical-align:middle}
+input,select,button{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--ln);border-radius:6px;padding:5px 6px;min-width:0;box-sizing:border-box}
+input,select{width:100%}
+input.n{text-align:right}
+button{cursor:pointer}
+button.p{background:var(--ac);color:var(--card);border-color:var(--ac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding:4px 6px}
+.f{font-size:12px;color:var(--mu)}
+.lock{background:var(--acbg);color:var(--ac);border-radius:6px;padding:2px 8px;font-size:12px;white-space:nowrap}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.bar label{font-size:12px;color:var(--mu)}
+.bar input{width:70px}
+#px th,#px td.r{background:var(--hd)}
+#px th{color:var(--tx)}
+.tt td{font-weight:600;border-bottom:0}
+.kp{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+.kp div{background:var(--acbg);color:var(--ac);border-radius:8px;padding:8px 14px;font-size:13px}
+.kp b{display:block;font-size:18px;font-weight:600}
+[hidden]{display:none!important}
+#ax th{background:var(--hd);color:var(--tx)}#ax td.r{background:var(--hd)}
+.kp .wn{background:#f7c1c1;color:#501313}
+#px tbody tr.k td,#ax tbody tr.k td{background:color-mix(in srgb,var(--rc) 28%,var(--card))}
+tr.k input{background:transparent}
+.bar input[type=color]{width:34px;height:28px;padding:1px}
+dialog{border:1px solid var(--ln);border-radius:10px;background:var(--card);color:var(--tx);padding:16px;max-width:600px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+#stl{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px}
+#stl label{display:flex;gap:6px;align-items:center;font-size:13px}#stl input{width:auto}
+#stp{columns:2;font-size:12px;color:var(--mu)}
+</style></head>
+<body><main>
+<h1>Bordro tanımları ve puantaj</h1>
+<p class="s">Tanımlar tüm personel için ortaktır. Puantaj tablosundaki sütunlar Tanımlar'dan oluşur.</p>
+
+<div class="bar" style="margin:0"><button class="p tb" data-v="L">Genel (Lohn)</button><button class="tb" data-v="A">Auslöse</button></div>
+<div class="bar" style="margin:12px 0 0">
+<span>Tatil eyaleti: <b id="stn"></b></span><button id="stb">Eyaleti değiştir</button>
+<label>Cumartesi rengi <input type="color" id="csa" value="#378add"></label>
+<label>Pazar rengi <input type="color" id="cso" value="#e24b4a"></label>
+<label>Tatil rengi <input type="color" id="cht" value="#ef9f27"></label></div>
+<div id="vL">
+<section>
+<h2>Tanımlar (genel)</h2>
+<p class="s">Her satır puantajda bir sütun olur. Geçerlilik başlangıcından önceki günlere o kalem uygulanmaz.</p>
+<div class="w"><table style="min-width:760px">
+<thead><tr><th style="width:17%">Sütun başlığı</th><th style="width:21%">Hesap türü</th><th style="width:11%">Değer</th><th style="width:10%">Adet</th><th style="width:17%">Geçerlilik başlangıcı</th><th>Hesaplanan oran</th><th style="width:34px"></th></tr></thead>
+<tbody id="defs"></tbody></table></div>
+<div class="bar"><button id="add">Yeni kalem ekle</button><button class="p" id="save">Değişiklikleri kaydet</button><span class="f" id="msg"></span></div>
+<div class="bar" style="border-top:1px solid var(--ln);padding-top:12px">
+<label>Km/saat <input class="n" type="number" id="kmh" value="70"></label>
+<label>Gece başlangıç (saat) <input class="n" type="number" id="ns" value="20"></label>
+<label>Gece bitiş (saat) <input class="n" type="number" id="ne" value="6"></label>
+<span class="f">Mola: 9 saatten az 0,5 · 9–12,5 saat 0,75 · 12,5 üstü 1 saat</span></div>
+</section>
+
+<section>
+<h2>inzig Schweißtechnik GmbH — Dokumentation der Arbeitszeit</h2>
+<div class="bar" style="margin:0 0 12px"><label>Name <select id="pp" style="width:auto"><option value="18.5">Özcan Sezgin — 18,50 €/saat</option><option value="17">Personel 2 — 17,00 €/saat</option><option value="21.25">Personel 3 — 21,25 €/saat</option></select></label>
+<span class="f" id="mo"></span></div>
+<div class="w sc"><table id="px" style="min-width:1000px"></table></div>
+<div class="bar"><label>Ay <input type="month" id="mon" value="2026-09" style="width:auto"></label><span class="f">Von ve Bis girince mola, çalışma saati, gece, cumartesi, pazar ve tatil saati otomatik hesaplanır. Ayı değiştirince gün listesi yenilenir.</span></div>
+<div class="kp" id="kp"></div>
+</section>
+</div>
+<div id="vA" hidden>
+<section>
+<h2>Auslöse tanımları (genel)</h2>
+<p class="s">Her satır bir kademe: Land ve en az kaç saat evden uzakta kalınırsa o gün ne ödenir. Güne uyan en yüksek kademe uygulanır, hiçbiri uymazsa 0 olur.</p>
+<div class="w"><table style="min-width:720px"><thead><tr><th style="width:11%">Land</th><th style="width:14%">En az saat</th><th>Toplam Auslöse €</th><th>Steuerfreie €</th><th>Pauschalversteuerte €</th><th style="width:19%">Geçerlilik başlangıcı</th><th style="width:34px"></th></tr></thead><tbody id="tdef"></tbody></table></div>
+<div class="bar"><button id="addT">Yeni kademe ekle</button><button class="p" id="saveA">Değişiklikleri kaydet</button><span class="f" id="msgA"></span></div>
+<p class="f">Land alanına Luxemburg veya Lux yazılsa da LU, Holland yazılsa da NL sayılır. Yeni ülke için yeni kod yazıp kademe ekleyebilirsin.</p>
+</section>
+<section>
+<h2>inzig Schweißtechnik GmbH — Auslöse</h2>
+<div class="bar" style="margin:0 0 12px"><span>Name: Özcan · Vorname: Sezgin</span><span class="f" id="moA"></span></div>
+<div class="w sc"><table id="ax" style="min-width:920px"></table></div>
+<div class="bar"><span class="f">Land ve Baustelle, Lohn tablosunda Baustelle girilen günlerden otomatik gelir. Abfahrt ve Ankunft ikisi de boşsa gün 24 saat sayılır, biri boşsa 00:00 kabul edilir.</span></div>
+<div class="kp" id="kpA"></div>
+</section>
+</div>
+</main>
+<dialog id="dlg">
+<h2>Tatil eyaleti</h2>
+<p class="s">Resmi tatiller seçtiğin eyalete göre belirlenir.</p>
+<div id="stl"></div>
+<label style="display:flex;gap:6px;align-items:center;margin-top:10px;font-size:13px"><input type="checkbox" id="xs" style="width:auto">Paskalya pazarı ve Pfingstsonntag da tatil sayılsın (Excel listende var)</label>
+<p class="f" style="margin:10px 0 0">Tarihler seçilen yıla göre otomatik hesaplanır. Sabit tarihli günler ve Paskalya'ya bağlı günler (Karfreitag, Himmelfahrt, Pfingsten, Fronleichnam) her yıl yeniden bulunur. Yıl, puantajdaki Ay alanından gelir.</p>
+<h2 id="sth" style="margin-top:14px;font-size:14px"></h2>
+<div id="stp"></div>
+<div class="bar"><button class="p" id="stok">Uygula</button><button id="stx">Kapat</button></div>
+</dialog>
+<script>
+var $=function(i){return document.getElementById(i)};
+var f=function(x,n){return x.toLocaleString("de-DE",{minimumFractionDigits:n==null?2:n,maximumFractionDigits:n==null?2:n})};
+var esc=function(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")};
+var S={kmh:70,ns:20,ne:6},AUTO=["arb","fahr","nacht","sa","so","fei"];
+var D=[
+{k:"arb",n:"Arb.std.",t:"pct",v:100,a:1,f:"2026-01-01"},
+{k:"fahr",n:"Fahr.Std.",t:"pct",v:100,a:1,f:"2026-01-01"},
+{k:"nacht",n:"Na. 25%",t:"pct",v:25,a:1,f:"2026-01-01"},
+{k:"sa",n:"Sa. 25%",t:"pct",v:25,a:1,f:"2026-01-01"},
+{k:"so",n:"So 75%",t:"pct",v:75,a:1,f:"2026-01-01"},
+{k:"wbz",n:"WBZ",t:"pct",v:100,a:1,f:"2026-01-01"},
+{k:"fei",n:"Fei. %",t:"pct",v:100,a:1,f:"2026-01-01"},
+{k:"sow5",n:"Zulage SoW5",t:"adet",v:30,a:1,f:"2026-01-01"}];
+var R=[
+{d:"2026-09-04",l:"D",b:"Hoffnungsthal",s:"07:00",e:"17:45",km:280,m:{}},
+{d:"2026-09-07",l:"D",b:"Unkel",s:"07:00",e:"18:45",km:160,m:{}},
+{d:"2026-09-08",l:"D",b:"Wiesau",s:"22:00",e:"09:45",km:510,m:{}},
+{d:"2026-09-09",l:"D",b:"Wiesau",s:"23:00",e:"08:45",km:0,m:{}},
+{d:"2026-09-10",l:"D",b:"Wiesau",s:"20:00",e:"04:30",km:0,m:{}},
+{d:"2026-09-11",l:"D",b:"Wiesau",s:"20:00",e:"04:30",km:510,m:{}},
+{d:"2026-09-14",l:"D",b:"Kassel",s:"20:00",e:"04:30",km:280,m:{}},
+{d:"2026-09-15",l:"D",b:"Kassel",s:"22:00",e:"04:30",km:140,m:{}},
+{d:"2026-09-16",l:"D",b:"Kassel",s:"21:00",e:"07:45",km:0,m:{}},
+{d:"2026-09-17",l:"D",b:"Kassel",s:"22:00",e:"06:30",km:0,m:{}},
+{d:"2026-09-18",l:"D",b:"Kassel",s:"",e:"",km:140,m:{}},
+{d:"2026-09-19",l:"LU",b:"Luxemburg",s:"20:00",e:"06:45",km:420,m:{}},
+{d:"2026-09-24",l:"D",b:"Hannover",s:"20:00",e:"04:30",km:720,m:{}}];
+var base=function(){return parseFloat($("pp").value)||0};
+var rate=function(d){return d.t==="pct"?base()*d.v/100:d.t==="fix"?d.v:d.v/(d.a||1)};
+var tm=function(s){var p=s.split(":");return p[0]*60+ +p[1]};
+var ov=function(a,b,c,d){return Math.max(0,Math.min(b,d)-Math.max(a,c))};
+function comp(r){
+var o={arb:0,fahr:(r.km||0)/S.kmh,nacht:0,sa:0,so:0,fei:0,x:0,pause:null};
+if(r.s&&r.e){var a=tm(r.s),dur=((tm(r.e)-a+1440)%1440)/60,p=dur<9?.5:dur>12.5?1:.75;
+o.pause=p;o.arb=Math.max(0,dur-p);
+var b=a+dur*60,n=S.ns*60,e=S.ne*60;
+o.nacht=Math.min(8,(ov(a,b,0,e)+ov(a,b,n,1440+e)+ov(a,b,1440+n,2880))/60);
+var w=new Date(r.d+"T00:00").getDay();if(w===6)o.sa=o.arb;if(w===0)o.so=o.arb;if(isHol(r.d))o.fei=o.arb}
+if(r.s&&r.e)o.x=o.arb;else if(isHol(r.d)){var w2=new Date(r.d+"T00:00").getDay();if(w2>0&&w2<6)o.x=8}
+return o}
+var qty=function(r,o,d){return AUTO.indexOf(d.k)>=0?o[d.k]:(r.m[d.k]||0)};
+function defs(){
+var h="";
+D.forEach(function(d,i){var x=d.t==="adet";
+h+='<tr><td><input data-a="n" data-i="'+i+'" value="'+esc(d.n)+'" aria-label="Sütun başlığı"></td>'+
+'<td><select data-a="t" data-i="'+i+'" aria-label="Hesap türü"><option value="pct"'+(d.t==="pct"?" selected":"")+'>Saat ücretinin %</option><option value="fix"'+(d.t==="fix"?" selected":"")+'>Birim başı sabit €</option><option value="adet"'+(x?" selected":"")+'>X adet için Y €</option></select></td>'+
+'<td><input class="n" type="number" step="0.5" data-a="v" data-i="'+i+'" value="'+d.v+'" aria-label="Değer"></td>'+
+'<td><input class="n" type="number" min="1" data-a="a" data-i="'+i+'" value="'+d.a+'"'+(x?"":" disabled")+' aria-label="Adet"></td>'+
+'<td><input type="date" data-a="f" data-i="'+i+'" value="'+d.f+'" aria-label="Geçerlilik başlangıcı"></td>'+
+'<td class="f" data-ds="'+i+'"></td>'+
+'<td><button data-x="'+i+'" aria-label="Sil" title="Sil">×</button></td></tr>'});
+$("defs").innerHTML=h;ds()}
+function ds(){D.forEach(function(d,i){var el=document.querySelector('[data-ds="'+i+'"]');
+el.textContent=d.t==="pct"?f(base())+" € × %"+d.v+" = "+f(rate(d))+" €":d.t==="fix"?f(rate(d))+" € / birim":d.a+" adet = "+f(d.v)+" € → "+f(rate(d))+" € / adet"})}
+function build(){
+var h='<thead><tr><th>Tag</th><th>Tarih</th><th>Land</th><th>Baustelle</th><th>Von</th><th>Bis</th><th>Pause</th><th>KM/FZ</th>';
+D.forEach(function(d){h+='<th class="r">'+esc(d.n)+'</th>'});
+h+='<th class="r">Arbeits std.</th><th style="width:30px"></th></tr><tr><th colspan="8" style="text-align:right">Oran €</th>';
+D.forEach(function(d,i){h+='<th class="r" data-rt="'+i+'"></th>'});
+h+='<th></th><th></th></tr></thead><tbody>';
+R.forEach(function(r,i){
+h+='<tr data-tr="'+i+'"><td class="r" data-wd="'+i+'"></td><td>'+r.d.slice(8)+'.'+r.d.slice(5,7)+'.</td>'+
+'<td><input data-r="'+i+'" data-f="l" value="'+esc(r.l)+'" style="width:44px"></td>'+
+'<td><input data-r="'+i+'" data-f="b" value="'+esc(r.b)+'" style="min-width:110px"></td>'+
+'<td>'+qs('data-r="'+i+'" data-f="s"',r.s)+'</td>'+
+'<td>'+qs('data-r="'+i+'" data-f="e"',r.e)+'</td>'+
+'<td class="r" data-p="'+i+'"></td>'+
+'<td><input class="n" type="number" data-r="'+i+'" data-f="km" value="'+r.km+'" style="width:70px"></td>';
+D.forEach(function(d){
+if(AUTO.indexOf(d.k)>=0)h+='<td class="r" data-q="'+i+'-'+d.k+'"></td>';
+else h+='<td><input class="n" type="number" step="0.5" data-r="'+i+'" data-m="'+d.k+'" value="'+(r.m[d.k]||"")+'" style="width:64px"></td>'});
+h+='<td class="r" data-x="'+i+'"></td><td><button data-xr="'+i+'" aria-label="Satırı temizle" title="Satırı temizle">×</button></td></tr>'});
+h+='</tbody><tfoot><tr class="tt"><td colspan="8" class="r">Miktar toplamı</td>';
+D.forEach(function(d,i){h+='<td class="r" data-sq="'+i+'"></td>'});
+h+='<td class="r" id="sx"></td><td></td></tr><tr class="tt"><td colspan="8" class="r">Tutar (€)</td>';
+D.forEach(function(d,i){h+='<td class="r" data-sa="'+i+'"></td>'});
+h+='<td></td><td></td></tr></tfoot>';
+$("px").innerHTML=h;var t1=document.querySelector("#px thead th");document.querySelectorAll("#px thead tr:nth-child(2) th").forEach(function(x){x.style.top=t1.offsetHeight+"px"});upd()}
+function upd(){
+var q=function(s){return document.querySelector(s)};
+var sq=D.map(function(){return 0}),sa=D.map(function(){return 0}),hrs=0,xs=0;
+R.forEach(function(r,i){var o=comp(r);rowFx(r,i);var xe=q('[data-x="'+i+'"]');xe.textContent=o.x?f(o.x):"";xe.title=(o.x&&!(r.s&&r.e))?"Tatil günü, çalışılmadı: 8 saat otomatik":"";hrs+=o.x;xs+=o.x;
+q('[data-p="'+i+'"]').textContent=o.pause==null?"":f(o.pause);
+D.forEach(function(d,j){var v=qty(r,o,d);
+if(AUTO.indexOf(d.k)>=0)q('[data-q="'+i+'-'+d.k+'"]').textContent=v?f(v):"";
+sq[j]+=v;if(r.d>=d.f)sa[j]+=v*rate(d);
+if(d.k==="fahr"||d.k==="wbz")hrs+=v})});
+var tot=0;$("sx").textContent=xs?f(xs):"0";
+D.forEach(function(d,j){q('[data-rt="'+j+'"]').textContent=f(rate(d));
+q('[data-sq="'+j+'"]').textContent=sq[j]?f(sq[j]):"0";
+q('[data-sa="'+j+'"]').textContent=f(sa[j]);tot+=sa[j]});
+var dt=R.length&&R[0].d?new Date(R[0].d+"T00:00"):null;
+$("mo").textContent=dt?"Monat: "+dt.toLocaleDateString("de-DE",{month:"long",year:"numeric"}):"";
+$("kp").innerHTML='<div>Toplam saat<b>'+f(hrs)+'</b></div><div>Toplam brüt<b>'+f(tot)+' €</b></div><div>Çalışılan gün<b>'+R.filter(function(r){return r.s&&r.e}).length+'</b></div>'}
+document.addEventListener("input",function(e){var t=e.target,a=t.dataset;
+if(a.a){var d=D[a.i];d[a.a]=(a.a==="v"||a.a==="a")?(parseFloat(t.value)||0):t.value;
+if(a.a==="n"){var th=document.querySelectorAll("#px thead tr:first-child th")[8+ +a.i];th.textContent=d.n}
+ds();upd()}
+if(a.r!==undefined){var r=R[a.r];if(a.m)r.m[a.m]=parseFloat(t.value)||0;else r[a.f]=a.f==="km"?(parseFloat(t.value)||0):t.value;upd()}
+if(t.id==="kmh"||t.id==="ns"||t.id==="ne"){S[t.id]=parseFloat(t.value)||0;upd()}});
+document.addEventListener("change",function(e){var t=e.target,a=t.dataset;
+if(a.a==="t"){D[a.i].t=t.value;defs();build()}
+if(t.id==="pp"){ds();upd()}});
+document.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var a=b.dataset;
+if(b.id==="add"){D.push({k:"x"+Date.now(),n:"Yeni kalem",t:"fix",v:10,a:1,f:"2026-01-01"});defs();build()}
+if(a.x!==undefined){D.splice(a.x,1);defs();build()}
+if(b.id==="addr"){R.push({d:"",l:"D",b:"",s:"",e:"",km:0,m:{}});build()}
+if(a.xr!==undefined){var r0=R[a.xr];r0.l="D";r0.b="";r0.s="";r0.e="";r0.km=0;r0.m={};build()}
+if(b.id==="save"){$("msg").textContent="Taslak: kayıt henüz bağlı değil.";setTimeout(function(){$("msg").textContent=""},2500)}});
+var T=[
+{c:"D",h:8,t:20,sf:14,pv:6,f:"2026-01-01"},
+{c:"D",h:24,t:40,sf:28,pv:12,f:"2026-01-01"},
+{c:"NL",h:7.5,t:21,sf:0,pv:0,f:"2026-01-01"},
+{c:"NL",h:14,t:40,sf:32,pv:8,f:"2026-01-01"},
+{c:"NL",h:24,t:45,sf:0,pv:0,f:"2026-01-01"},
+{c:"LU",h:7.5,t:21,sf:0,pv:0,f:"2026-01-01"},
+{c:"LU",h:14,t:40,sf:0,pv:0,f:"2026-01-01"},
+{c:"LU",h:24,t:45,sf:0,pv:0,f:"2026-01-01"}];
+var AM0=[
+{d:"2026-09-04",f:"05:00",g:"17:45"},
+{d:"2026-09-07",f:"05:00",g:"21:00"},
+{d:"2026-09-08",f:"12:00"},
+{d:"2026-09-12",c:"D",b:"Wiesau",g:"17:00"},
+{d:"2026-09-14",f:"16:00",g:"08:30"},
+{d:"2026-09-15",f:"12:00"},
+{d:"2026-09-18",g:"18:00"},
+{d:"2026-09-19",f:"11:00",g:"09:00"},
+{d:"2026-09-24",f:"18:00",g:"06:30"}],AM={},AR=[];
+function au(d){var r=RM[d];return r&&(r.b||r.s||r.e)?r:null}
+function ld(r){var a=au(r.d);return r.c||(a?a.l:"")}
+function mkA(){var p=$("mon").value.split("-"),y=+p[0],m=+p[1],n=new Date(y,m,0).getDate();AR=[];for(var i=1;i<=n;i++){var d=y+"-"+p2(m)+"-"+p2(i);AR.push(AM[d]||(AM[d]={c:"",d:d,a:"",b:"",f:"",g:"",u:0}))}}
+var AL={LU:["lu","lux","luxemburg","luxembourg"],NL:["nl","niederlande","niederland","holland","holand","niderland"],D:["d","de","deu","deutschland"]};
+function nl(s){s=String(s||"").trim().toLowerCase();if(!s)return "";for(var k in AL)if(AL[k].indexOf(s)>=0)return k;return s.toUpperCase()}
+function ab(r){if(!nl(ld(r)))return null;if(!r.f&&!r.g)return 24;var a=r.f?tm(r.f):0,b=r.g?tm(r.g):0;return ((b-a+1440)%1440)/60}
+function tier(c,h,d){var z=null;T.forEach(function(t){if(t.c===c&&h>=t.h&&(!d||t.f<=d)&&(!z||t.h>z.h))z=t});return z}
+function dA(){var h="";
+T.forEach(function(t,i){var n=function(k){return '<td><input class="n" type="number" step="0.5" data-ta="'+k+'" data-ti="'+i+'" value="'+t[k]+'"></td>'};
+h+='<tr><td><input data-ta="c" data-ti="'+i+'" value="'+esc(t.c)+'" aria-label="Land"></td>'+n("h")+n("t")+n("sf")+n("pv")+'<td><input type="date" data-ta="f" data-ti="'+i+'" value="'+t.f+'"></td><td><button data-xt="'+i+'" aria-label="Sil" title="Sil">×</button></td></tr>'});
+$("tdef").innerHTML=h}
+function bA(){
+var h='<thead><tr><th>Land</th><th>Datum</th><th>Auftraggeber</th><th>Baustelle</th><th>Abfahrt</th><th>Ankunft</th><th class="r">Abwesenheit Std.</th><th class="r">Auslösung insgesamt</th><th class="r">Übernachtung</th><th class="r">Steuerfreie</th><th class="r">Pauschalversteuerte</th><th style="width:30px"></th></tr></thead><tbody>';
+AR.forEach(function(r,i){var t2=function(k,v,w){return '<td><input data-ar="'+i+'" data-af="'+k+'" value="'+esc(v)+'" style="min-width:'+w+'px"></td>'};var t=function(k,w){return '<td><input data-ar="'+i+'" data-af="'+k+'" value="'+esc(r[k])+'" style="min-width:'+w+'px"></td>'};
+h+='<tr data-atr="'+i+'">'+t2("c",ld(r),50)+'<td>'+r.d.slice(8)+'.'+r.d.slice(5,7)+'.</td>'+t("a",80)+t2("b",r.b||(au(r.d)?au(r.d).b:""),100)+
+'<td>'+qs('data-ar="'+i+'" data-af="f"',r.f)+'</td><td>'+qs('data-ar="'+i+'" data-af="g"',r.g)+'</td>'+
+'<td class="r" data-ah="'+i+'"></td><td class="r" data-ai="'+i+'"></td><td><input class="n" type="number" data-ar="'+i+'" data-af="u" value="'+(r.u||"")+'" style="width:70px"></td><td class="r" data-ak="'+i+'"></td><td class="r" data-al="'+i+'"></td>'+
+'<td><button data-xa="'+i+'" aria-label="Satırı temizle" title="Satırı temizle">×</button></td></tr>'});
+h+='</tbody><tfoot><tr class="tt"><td colspan="7" class="r">Gesamt:</td><td class="r" id="gI"></td><td class="r" id="gJ"></td><td class="r" id="gK"></td><td class="r" id="gL"></td><td></td></tr></tfoot>';
+$("ax").innerHTML=h;uA()}
+function uA(){
+var q=function(s){return document.querySelector(s)},I=0,J=0,K=0,L=0;
+AR.forEach(function(r,i){tint(q('[data-atr="'+i+'"]'),r.d);var c=nl(ld(r)),h=ab(r),z=h==null?null:tier(c,h,r.d),ti=z?z.t:0,sf=z?z.sf:0,pv=z?z.pv:0;
+q('[data-ah="'+i+'"]').textContent=h==null?"":f(h);
+q('[data-ai="'+i+'"]').textContent=h==null?"":f(ti);
+q('[data-ak="'+i+'"]').textContent=sf?f(sf):"";
+q('[data-al="'+i+'"]').textContent=pv?f(pv):"";
+I+=ti;K+=sf;L+=pv;J+=r.u||0});
+$("gI").textContent=f(I);$("gJ").textContent=f(J);$("gK").textContent=f(K);$("gL").textContent=f(L);
+var df=I-K-L,dt=AR.length&&AR[0].d?new Date(AR[0].d+"T00:00"):null;
+$("moA").textContent=dt?"Monat: "+dt.toLocaleDateString("de-DE",{month:"long",year:"numeric"}):"";
+$("kpA").innerHTML='<div>Auslöse toplam<b>'+f(I)+' €</b></div><div>Steuerfreie<b>'+f(K)+' €</b></div><div>Pauschalversteuerte<b>'+f(L)+' €</b></div><div class="'+(Math.abs(df)>0.005?"wn":"")+'">Fark (toplam − steuerfrei − pauschal)<b>'+f(df)+' €</b></div>'}
+document.addEventListener("input",function(e){var t=e.target,a=t.dataset;
+if(a.ta!==undefined){T[a.ti][a.ta]=a.ta==="c"?t.value.trim().toUpperCase():a.ta==="f"?t.value:(parseFloat(t.value)||0);uA()}
+if(a.ar!==undefined){AR[a.ar][a.af]=a.af==="u"?(parseFloat(t.value)||0):t.value;uA()}});
+document.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var a=b.dataset;
+if(a.v==="A")bA();if(a.v){["L","A"].forEach(function(k){$("v"+k).hidden=k!==a.v});document.querySelectorAll(".tb").forEach(function(x){x.classList.toggle("p",x.dataset.v===a.v)})}
+if(b.id==="addT"){T.push({c:"D",h:0,t:0,sf:0,pv:0,f:"2026-01-01"});dA()}
+if(a.xt!==undefined){T.splice(a.xt,1);dA();uA()}
+if(b.id==="addA"){AR.push({c:"",d:"",a:"",b:"",f:"",g:"",u:0});bA()}
+if(a.xa!==undefined){var q0=AR[a.xa];q0.c="";q0.b="";q0.a="";q0.f="";q0.g="";q0.u=0;bA()}
+if(b.id==="saveA"){$("msgA").textContent="Taslak: kayıt henüz bağlı değil.";setTimeout(function(){$("msgA").textContent=""},2500)}});
+var STN={BW:"Baden-Württemberg",BY:"Bayern",BE:"Berlin",BB:"Brandenburg",HB:"Bremen",HH:"Hamburg",HE:"Hessen",MV:"Mecklenburg-Vorpommern",NI:"Niedersachsen",NW:"Nordrhein-Westfalen",RP:"Rheinland-Pfalz",SL:"Saarland",SN:"Sachsen",ST:"Sachsen-Anhalt",SH:"Schleswig-Holstein",TH:"Thüringen"};
+var ST="NW",PEND="NW",XS=true,HC={},CS={sa:"#378add",so:"#e24b4a",h:"#ef9f27"},RM={},WD=["So","Mo","Di","Mi","Do","Fr","Sa"];
+var p2=function(n){return (n<10?"0":"")+n};
+var iso=function(d){return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())};
+var ad=function(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)};
+function easter(y){var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,g=Math.floor((b+8)/25),h=Math.floor((b-g+1)/3),k=(19*a+b-d-h+15)%30,i=Math.floor(c/4),j=c%4,l=(32+2*e+2*i-k-j)%7,m=Math.floor((a+11*k+22*l)/451),t=k+l-7*m+114;return new Date(y,Math.floor(t/31)-1,t%31+1)}
+function hol(y,s){var e=easter(y),L=[],A=function(m,d,n){L.push([iso(new Date(y,m-1,d)),n])},B=function(k,n){L.push([iso(ad(e,k)),n])},has=function(l){return l.indexOf(s)>=0};
+A(1,1,"Neujahr");B(-2,"Karfreitag");B(1,"Ostermontag");A(5,1,"Tag der Arbeit");B(39,"Christi Himmelfahrt");B(50,"Pfingstmontag");A(10,3,"Tag der Deutschen Einheit");A(12,25,"1. Weihnachtstag");A(12,26,"2. Weihnachtstag");
+if(has(["BW","BY","ST"]))A(1,6,"Heilige Drei Könige");
+if(has(["BE","MV"]))A(3,8,"Internationaler Frauentag");
+if(s==="BB"||XS){B(0,"Ostersonntag");B(49,"Pfingstsonntag")}
+if(has(["BW","BY","HE","NW","RP","SL"]))B(60,"Fronleichnam");
+if(has(["BY","SL"]))A(8,15,s==="BY"?"Mariä Himmelfahrt (überwiegend kath. Gemeinden)":"Mariä Himmelfahrt");
+if(s==="TH")A(9,20,"Weltkindertag");
+if(has(["BB","HB","HH","MV","NI","SN","SH","ST","TH"]))A(10,31,"Reformationstag");
+if(has(["BW","BY","NW","RP","SL"]))A(11,1,"Allerheiligen");
+if(s==="SN"){var b=new Date(y,10,22);while(b.getDay()!==3)b.setDate(b.getDate()-1);L.push([iso(b),"Buß- und Bettag"])}
+return L.sort()}
+function hm(y){var k=y+ST+XS;if(!HC[k]){var m={};hol(y,ST).forEach(function(x){m[x[0]]=x[1]});HC[k]=m}return HC[k]}
+function isHol(d){return d?hm(+d.slice(0,4))[d]:undefined}
+function tint(tr,d){if(!tr)return;var c=null;if(d){if(isHol(d))c=CS.h;else{var w=new Date(d+"T00:00").getDay();if(w===0)c=CS.so;else if(w===6)c=CS.sa}}
+if(c){tr.classList.add("k");tr.style.setProperty("--rc",c)}else{tr.classList.remove("k");tr.style.removeProperty("--rc")}}
+function rowFx(r,i){var td=document.querySelector('[data-wd="'+i+'"]');td.textContent=WD[new Date(r.d+"T00:00").getDay()];td.title=isHol(r.d)||"";tint(document.querySelector('[data-tr="'+i+'"]'),r.d)}
+function mkR(){var p=$("mon").value.split("-"),y=+p[0],m=+p[1],n=new Date(y,m,0).getDate();R=[];for(var i=1;i<=n;i++){var d=y+"-"+p2(m)+"-"+p2(i);R.push(RM[d]||(RM[d]={d:d,l:"D",b:"",s:"",e:"",km:0,m:{}}))}}
+function prev(){var y=+$("mon").value.slice(0,4);$("sth").textContent=STN[PEND]+" — "+y+" tatilleri";
+$("stp").innerHTML=hol(y,PEND).map(function(x){return x[0].slice(8)+"."+x[0].slice(5,7)+". "+x[1]}).join("<br>")}
+function stl(){var h="";for(var k in STN)h+='<label><input type="radio" name="stt" value="'+k+'"'+(k===PEND?" checked":"")+'>'+STN[k]+'</label>';$("stl").innerHTML=h;$("xs").checked=XS}
+function refresh(){HC={};$("stn").textContent=STN[ST];upd();uA()}
+document.addEventListener("input",function(e){var t=e.target,m={csa:"sa",cso:"so",cht:"h"};if(m[t.id]){CS[m[t.id]]=t.value;upd();uA()}});
+document.addEventListener("change",function(e){var t=e.target;
+if(t.id==="mon"&&t.value){mkR();mkA();build();bA()}
+if(t.name==="stt"){PEND=t.value;prev()}
+if(t.id==="xs"){XS=t.checked;prev()}});
+document.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+if(b.id==="stb"){PEND=ST;stl();prev();$("dlg").showModal()}
+if(b.id==="stok"){ST=PEND;$("dlg").close();refresh()}
+if(b.id==="stx")$("dlg").close()});
+var QO='<option value=""></option>';for(var qh=0;qh<24;qh++)for(var qm=0;qm<60;qm+=15)QO+='<option value="'+p2(qh)+':'+p2(qm)+'">'+p2(qh)+':'+p2(qm)+'</option>';
+function qs(a,v){return '<select '+a+' style="width:76px">'+(v?QO.replace('value="'+v+'"','value="'+v+'" selected'):QO)+'</select>'}
+R.forEach(function(r){RM[r.d]=r});mkR();
+AM0.forEach(function(x){AM[x.d]={c:x.c||"",d:x.d,a:"",b:x.b||"",f:x.f||"",g:x.g||"",u:0}});mkA();
+defs();build();dA();bA();$("stn").textContent=STN[ST];
+</script></body></html>

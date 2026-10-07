@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Giriş Yap</title>
+<link rel="stylesheet" href="/assets/app.css" />
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0b1220 0%, #1e3a8a 50%, #7c3aed 100%);
+    padding: 20px;
+  }
+
+  .giris-kart {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, .97);
+    border-radius: 20px;
+    padding: 34px 30px 26px;
+    box-shadow: 0 30px 60px -20px rgba(2, 6, 23, .7);
+    animation: girisAnim .5s cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  @keyframes girisAnim {
+    from { opacity: 0; transform: translateY(24px) scale(.97); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .giris-mark {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+    margin: 0 auto 14px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    box-shadow: 0 12px 26px -10px rgba(37, 99, 235, .9);
+    animation: markPulse 4s ease-in-out infinite;
+  }
+
+  .giris-kart h1 { font-size: 22px; text-align: center; margin-bottom: 4px; }
+  .giris-kart p { text-align: center; color: var(--muted); font-size: 13.5px; margin-bottom: 24px; }
+
+  .lang-mini { display: flex; gap: 6px; justify-content: center; margin-top: 18px; }
+
+  .lang-mini a {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 999px;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    transition: all .2s;
+  }
+
+  .lang-mini a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+  .hatirla {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: -6px 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .hatirla input { width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="giris-kart">
+    <div class="giris-mark">⚙️</div>
+    <h1 id="girisBaslik">Personel Sistemi</h1>
+    <p id="girisAlt">GoRail Yönetim Paneli</p>
+
+    <div id="hata" class="msg err" style="display: none"></div>
+
+    <form id="loginForm">
+      <div style="margin-bottom:14px">
+        <label for="username" style="display:block;font-size:13px;font-weight:600;margin-bottom:5px">Kullanıcı Adı</label>
+        <input type="text" id="username" autocomplete="username" required style="width:100%" />
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label for="password" style="display:block;font-size:13px;font-weight:600;margin-bottom:5px">Şifre</label>
+        <input type="password" id="password" autocomplete="current-password" required style="width:100%" />
+      </div>
+
+      <label class="hatirla" for="hatirla">
+        <input type="checkbox" id="hatirla" />
+        <span id="hatirlaEtiket">Beni hatırla</span>
+      </label>
+
+      <button class="btn" type="submit" id="submitBtn" style="width:100%; justify-content:center">Giriş Yap</button>
+    </form>
+
+    <div class="lang-mini">
+      <a href="/lang/tr?lang=tr" class="active" id="langTr">TR</a>
+      <a href="/lang/de?lang=de" id="langDe">DE</a>
+    </div>
+  </div>
+
+<script>
+  const metinler = {
+    tr: {
+      baslik: "Personel Sistemi",
+      alt: "GoRail Yönetim Paneli",
+      kullanici: "Kullanıcı Adı",
+      sifre: "Şifre",
+      giris: "Giriş Yap",
+      bekliyor: "Bekleniyor...",
+      hatirla: "Beni hatırla",
+    },
+    de: {
+      baslik: "Personalsystem",
+      alt: "GoRail Verwaltungsportal",
+      kullanici: "Benutzername",
+      sifre: "Passwort",
+      giris: "Anmelden",
+      bekliyor: "Wird geprüft...",
+      hatirla: "Angemeldung merken",
+    },
+  };
+
+  const lang = (document.cookie.match(/dil=(tr|de)/) || [, "tr"])[1];
+  const m = metinler[lang];
+
+  document.getElementById("girisBaslik").textContent = m.baslik;
+  document.getElementById("girisAlt").textContent = m.alt;
+  document.querySelector('label[for="username"]').textContent = m.kullanici;
+  document.querySelector('label[for="password"]').textContent = m.sifre;
+  document.getElementById("submitBtn").textContent = m.giris;
+  document.getElementById("hatirlaEtiket").textContent = m.hatirla;
+  document.getElementById("langTr").classList.toggle("active", lang === "tr");
+  document.getElementById("langDe").classList.toggle("active", lang === "de");
+
+  /* ---- Beni hatırla: kullanıcı adı ve şifre tarayıcıda saklanır ---- */
+
+  const HATIRLA_ANAHTARI = "gorail.hatirla";
+  const hatirlaKutu = document.getElementById("hatirla");
+  const kullaniciAlani = document.getElementById("username");
+  const sifreAlani = document.getElementById("password");
+
+  function hatirlananlariOku() {
+    try {
+      return JSON.parse(localStorage.getItem(HATIRLA_ANAHTARI)) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function hatirlaTemizle() {
+    try {
+      localStorage.removeItem(HATIRLA_ANAHTARI);
+    } catch {
+      /* Depolama kapaliysa sessizce gec. */
+    }
+  }
+
+  // Sayfa acilisinda kayitli bilgileri forma geri koy.
+  const kayitli = hatirlananlariOku();
+  if (kayitli && kayitli.kullanici) {
+    kullaniciAlani.value = kayitli.kullanici;
+    sifreAlani.value = kayitli.sifre || "";
+    hatirlaKutu.checked = true;
+  }
+
+  // Kutu kapatilinca kayit hemen silinir.
+  hatirlaKutu.addEventListener("change", () => {
+    if (!hatirlaKutu.checked) hatirlaTemizle();
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const hata = document.getElementById("hata");
+    const btn = document.getElementById("submitBtn");
+    hata.style.display = "none";
+    btn.disabled = true;
+    btn.textContent = m.bekliyor;
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: document.getElementById("username").value,
+          password: document.getElementById("password").value,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.message || "Giriş yapılamadı.");
+
+      // Giriş basarili: isaretli ise bilgileri sakla, degilse kaydi sil.
+      if (hatirlaKutu.checked) {
+        try {
+          localStorage.setItem(
+            HATIRLA_ANAHTARI,
+            JSON.stringify({ kullanici: kullaniciAlani.value, sifre: sifreAlani.value })
+          );
+        } catch {
+          /* Depolama kapaliysa giriş yine calisir. */
+        }
+      } else {
+        hatirlaTemizle();
+      }
+
+      // Personel rollerinin acmadiği ilk sayfaya dusulur; admin her seyi gorur.
+      const ilkSayfa =
+        data.role === "admin"
+          ? "/onaylar.html"
+          : ["saatlerim.html", "islerim.html"].find((s) => (data.sayfalar || []).includes(s));
+      window.location.href = ilkSayfa || "/index.html";
+    } catch (err) {
+      hata.textContent = err.message;
+      hata.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = m.giris;
+    }
+  });
+</script>
+</body>
+</html>
